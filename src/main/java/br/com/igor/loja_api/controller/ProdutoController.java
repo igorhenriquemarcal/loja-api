@@ -1,14 +1,19 @@
 package br.com.igor.loja_api.controller;
 
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.igor.loja_api.dto.ProdutoRequest;
 import br.com.igor.loja_api.modelo.Produto;
 import br.com.igor.loja_api.servico.ProdutoService;
 
@@ -40,5 +45,16 @@ public class ProdutoController {
             return ResponseEntity.notFound().build();   // 404
         }
         return ResponseEntity.ok(produto);              // 200 + o produto em JSON
+    }
+
+    // POST /produtos (o produto novo vem no corpo do pedido, em JSON)
+    @PostMapping
+    public ResponseEntity<?> cadastrar(@RequestBody ProdutoRequest dados) {
+        try {
+            Produto produto = produtoService.cadastrar(dados);
+            return ResponseEntity.status(HttpStatus.CREATED).body(produto);   // 201 + o produto criado
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("erro", e.getMessage()));   // 400 + o motivo
+        }
     }
 }

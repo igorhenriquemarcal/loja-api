@@ -30,6 +30,10 @@ public abstract class Produto {
         return preco;
     }
 
+    public void setPreco(double preco) {
+        this.preco = preco;
+    }
+
     public void setNome(String nome){
         this.nome = nome;
     }

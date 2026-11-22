@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import br.com.igor.loja_api.dto.ProdutoUpdateRequest;
 import br.com.igor.loja_api.dto.ProdutoRequest;
 import br.com.igor.loja_api.modelo.Alimento;
 import br.com.igor.loja_api.modelo.Catalogo;
@@ -89,4 +90,28 @@ public class ProdutoService {
     public boolean remover(int codigo) {
         return catalogo.remover(codigo);
     }
+    // devolve o produto alterado, ou null se o código não existir
+    public Produto atualizar(int codigo, ProdutoUpdateRequest dados) {
+        Produto produto = catalogo.buscar(codigo);
+        if (produto == null) {
+            return null;
+        }
+
+        // valida tudo antes de alterar qualquer coisa
+        if (dados.nome() == null || dados.nome().isBlank()) {
+            throw new IllegalArgumentException("O nome não pode ficar vazio.");
+        }
+        if (dados.preco() <= 0) {
+            throw new IllegalArgumentException("O preço deve ser maior que zero.");
+        }
+        if (dados.estoque() < 0) {
+            throw new IllegalArgumentException("O estoque não pode ser negativo.");
+        }
+
+        produto.setNome(dados.nome().trim());
+        produto.setPreco(dados.preco());
+        produto.setEstoque(dados.estoque());
+        return produto;
+    }
+
 }

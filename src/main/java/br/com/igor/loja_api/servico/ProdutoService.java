@@ -84,4 +84,9 @@ public class ProdutoService {
 
         return produto;
     }
+
+    // devolve true se removeu, false se o código não existia
+    public boolean remover(int codigo) {
+        return catalogo.remover(codigo);
+    }
 }

@@ -3,6 +3,7 @@ package br.com.igor.loja_api.controller;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -56,5 +57,14 @@ public class ProdutoController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("erro", e.getMessage()));   // 400 + o motivo
         }
+    }
+
+    // DELETE /produtos/1
+    @DeleteMapping("/{codigo}")
+    public ResponseEntity<Void> remover(@PathVariable int codigo) {
+        if (!produtoService.remover(codigo)) {
+            return ResponseEntity.notFound().build();    // 404: não existia
+        }
+        return ResponseEntity.noContent().build();       // 204: apagado
     }
 }

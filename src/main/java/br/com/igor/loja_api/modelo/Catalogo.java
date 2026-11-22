@@ -35,4 +35,9 @@ public class Catalogo {
         return new ArrayList<>(produtos.values());
     }
 
+    // devolve true se removeu, false se o código não existia
+    public boolean remover(int codigo) {
+        return produtos.remove(codigo) != null;
+    }
+
 }

@@ -1,8 +1,18 @@
 package br.com.igor.loja_api.modelo;
 
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+
+@Entity
+@DiscriminatorValue("ROUPA")
 public class Roupa extends Produto {
 
     private String tamanho;
+
+    // construtor vazio exigido pelo JPA
+    protected Roupa() {
+    }
+
 
     public Roupa(int codigo, String nome, double preco, int estoque, String tamanho) {
         super(codigo, nome, preco, estoque);

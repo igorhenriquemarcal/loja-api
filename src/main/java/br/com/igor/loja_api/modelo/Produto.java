@@ -1,11 +1,25 @@
 package br.com.igor.loja_api.modelo;
 
+import jakarta.persistence.DiscriminatorColumn;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
+
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "tipo")
 public abstract class Produto {
 
+    @Id
     private int codigo;
     private String nome;
     private double preco;
     private int estoque;
+
+    // o JPA precisa de um construtor vazio para recriar o objeto a partir do banco
+    protected Produto() {
+    }
 
     public Produto(int codigo, String nome, double preco, int estoque) {
         this.codigo = codigo;
@@ -14,16 +28,20 @@ public abstract class Produto {
         this.estoque = estoque;
     }
 
-    public int getCodigo(){
+    public int getCodigo() {
         return codigo;
     }
 
-    public void setCodigo(int codigo){
+    public void setCodigo(int codigo) {
         this.codigo = codigo;
     }
 
-    public String getNome(){
+    public String getNome() {
         return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
     public double getPreco() {
@@ -32,10 +50,6 @@ public abstract class Produto {
 
     public void setPreco(double preco) {
         this.preco = preco;
-    }
-
-    public void setNome(String nome){
-        this.nome = nome;
     }
 
     public int getEstoque() {
@@ -54,8 +68,8 @@ public abstract class Produto {
         if (quantidade <= 0) {
             throw new EstoqueInsuficienteException("Quantidade deve ser maior que zero.");
         }
-        if (quantidade > estoque){
-            throw new EstoqueInsuficienteException("Estoque insuficiente de " + nome + "Disponível: " + estoque);
+        if (quantidade > estoque) {
+            throw new EstoqueInsuficienteException("Estoque insuficiente de " + nome + ". Disponível: " + estoque);
         }
         estoque -= quantidade;
     }

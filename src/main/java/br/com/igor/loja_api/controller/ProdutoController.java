@@ -3,6 +3,7 @@ package br.com.igor.loja_api.controller;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PutMapping;
 import br.com.igor.loja_api.dto.ProdutoUpdateRequest;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -52,7 +53,7 @@ public class ProdutoController {
 
     // POST /produtos (o produto novo vem no corpo do pedido, em JSON)
     @PostMapping
-    public ResponseEntity<?> cadastrar(@RequestBody ProdutoRequest dados) {
+    public ResponseEntity<?> cadastrar(@Valid @RequestBody ProdutoRequest dados) {
         try {
             Produto produto = produtoService.cadastrar(dados);
             return ResponseEntity.status(HttpStatus.CREATED).body(produto);   // 201 + o produto criado
@@ -73,7 +74,7 @@ public class ProdutoController {
     // PUT /produtos/1  (os dados novos vêm no corpo do pedido, em JSON)
     @PutMapping("/{codigo}")
     public ResponseEntity<?> atualizar(@PathVariable int codigo,
-                                       @RequestBody ProdutoUpdateRequest dados) {
+                                       @Valid @RequestBody ProdutoUpdateRequest dados) {
         try {
             Produto produto = produtoService.atualizar(codigo, dados);
             if (produto == null) {

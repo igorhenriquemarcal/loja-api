@@ -55,6 +55,17 @@ public class VendaService {
         return VendaResponse.de(venda);
     }
 
+    // fecha a venda e baixa o estoque de todos os itens.
+    // @Transactional = "tudo ou nada": se QUALQUER coisa der erro no meio (RuntimeException),
+    // o Spring desfaz tudo (rollback) e o banco fica como estava antes
+    @Transactional
+    public VendaResponse finalizar(Long vendaId) {
+        Venda venda = buscarVenda(vendaId);
+        venda.finalizar();              // muda status e estoque dos produtos (em memória)
+        vendaRepository.save(venda);    // deixa explícito: grava a venda (os produtos vão junto no commit)
+        return VendaResponse.de(venda);
+    }
+
     private Venda buscarVenda(Long id) {
         return vendaRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Venda " + id + " não encontrada."));

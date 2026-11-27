@@ -45,6 +45,13 @@ public class VendaController {
         return vendaService.adicionarItem(id, dados);   // 200 + a venda atualizada
     }
 
+    // POST /vendas/1/finalizar  -> cliente pagou: baixa o estoque e fecha a venda
+    // (POST porque é uma AÇÃO que muda várias coisas, não só "trocar um campo")
+    @PostMapping("/{id}/finalizar")
+    public VendaResponse finalizar(@PathVariable Long id) {
+        return vendaService.finalizar(id);   // 200 + a venda FINALIZADA
+    }
+
     // DELETE /vendas/1/itens/5  -> tira um item da venda
     @DeleteMapping("/{id}/itens/{itemId}")
     public VendaResponse removerItem(@PathVariable Long id, @PathVariable Long itemId) {

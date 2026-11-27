@@ -83,9 +83,10 @@ public abstract class Produto {
 
     public abstract BigDecimal calcularFrete();
 
-    public void baixarEstoque(int quantidade) throws EstoqueInsuficienteException {
+    // tira da prateleira; recusa se não tiver o suficiente
+    public void baixarEstoque(int quantidade) {
         if (quantidade <= 0) {
-            throw new EstoqueInsuficienteException("Quantidade deve ser maior que zero.");
+            throw new IllegalArgumentException("Quantidade deve ser maior que zero.");
         }
         if (quantidade > estoque) {
             throw new EstoqueInsuficienteException("Estoque insuficiente de " + nome + ". Disponível: " + estoque);

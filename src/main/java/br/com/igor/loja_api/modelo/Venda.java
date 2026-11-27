@@ -27,6 +27,9 @@ public class Venda {
     // quando a venda foi aberta
     private LocalDateTime dataHora;
 
+    // quando foi paga (fica vazio enquanto a venda está aberta)
+    private LocalDateTime dataHoraFinalizacao;
+
     // STRING: grava "ABERTA" no banco (e não 0, 1, 2), mais fácil de ler e mais seguro
     @Enumerated(EnumType.STRING)
     private StatusVenda status;
@@ -74,6 +77,28 @@ public class Venda {
         }
     }
 
+    // o cliente pagou: tira os produtos da prateleira e fecha a comanda
+    public void finalizar() {
+        garantirAberta();
+        if (itens.isEmpty()) {
+            throw new IllegalArgumentException("A venda " + id + " não tem itens.");
+        }
+
+        // 1ª volta: CONFERE todos os itens antes de mexer em qualquer estoque.
+        // (se o 3º item não tiver estoque, o 1º e o 2º nem chegam a ser baixados)
+        for (ItemVenda item : itens) {
+            verificarEstoque(item.getProduto(), item.getQuantidade());
+        }
+
+        // 2ª volta: agora sim, BAIXA o estoque de cada um
+        for (ItemVenda item : itens) {
+            item.getProduto().baixarEstoque(item.getQuantidade());
+        }
+
+        status = StatusVenda.FINALIZADA;
+        dataHoraFinalizacao = LocalDateTime.now();
+    }
+
     // só dá para mexer numa venda que ainda está aberta
     private void garantirAberta() {
         if (status != StatusVenda.ABERTA) {
@@ -84,7 +109,7 @@ public class Venda {
     // aqui só CONFERE se tem estoque; a baixa de verdade acontece ao finalizar a venda
     private void verificarEstoque(Produto produto, int quantidadeDesejada) {
         if (quantidadeDesejada > produto.getEstoque()) {
-            throw new IllegalArgumentException("Estoque insuficiente de " + produto.getNome()
+            throw new EstoqueInsuficienteException("Estoque insuficiente de " + produto.getNome()
                     + ". Disponível: " + produto.getEstoque());
         }
     }
@@ -104,6 +129,10 @@ public class Venda {
 
     public LocalDateTime getDataHora() {
         return dataHora;
+    }
+
+    public LocalDateTime getDataHoraFinalizacao() {
+        return dataHoraFinalizacao;
     }
 
     public StatusVenda getStatus() {

@@ -3,6 +3,7 @@ package br.com.igor.loja_api.excecao;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import br.com.igor.loja_api.modelo.EstoqueInsuficienteException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -34,6 +35,15 @@ public class TratadorDeErros {
         Map<String, Object> corpo = new LinkedHashMap<>();
         corpo.put("erro", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(corpo);   // 404
+    }
+
+    // não tem produto suficiente na prateleira
+    // 409 Conflict: o pedido é válido, mas conflita com a situação atual (o estoque)
+    @ExceptionHandler(EstoqueInsuficienteException.class)
+    public ResponseEntity<Map<String, Object>> tratarEstoqueInsuficiente(EstoqueInsuficienteException ex) {
+        Map<String, Object> corpo = new LinkedHashMap<>();
+        corpo.put("erro", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(corpo);   // 409
     }
 
     // regra de negócio recusada pelo service (código repetido, tipo inválido...)

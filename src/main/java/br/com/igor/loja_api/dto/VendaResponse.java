@@ -13,6 +13,7 @@ import br.com.igor.loja_api.modelo.Venda;
 public record VendaResponse(
         Long id,
         LocalDateTime dataHora,
+        LocalDateTime dataHoraFinalizacao,
         StatusVenda status,
         List<ItemVendaResponse> itens,
         BigDecimal total
@@ -22,6 +23,7 @@ public record VendaResponse(
         List<ItemVendaResponse> itens = venda.getItens().stream()
                 .map(ItemVendaResponse::de)
                 .toList();
-        return new VendaResponse(venda.getId(), venda.getDataHora(), venda.getStatus(), itens, venda.getTotal());
+        return new VendaResponse(venda.getId(), venda.getDataHora(), venda.getDataHoraFinalizacao(),
+                venda.getStatus(), itens, venda.getTotal());
     }
 }

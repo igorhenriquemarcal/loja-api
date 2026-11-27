@@ -43,28 +43,15 @@ public class ProdutoService {
         return repositorio.findById(codigo).orElse(null);
     }
 
-    // lê a ficha, confere os dados e cria o produto do tipo certo
+    // cria o produto do tipo certo
+    // (os campos já chegam conferidos pelo @Valid do controller; aqui ficam só as regras de negócio)
     public Produto cadastrar(ProdutoRequest dados) {
-        // 1. campos de texto preenchidos?
-        if (dados.tipo() == null || dados.nome() == null || dados.nome().isBlank()
-                || dados.extra() == null || dados.extra().isBlank()) {
-            throw new IllegalArgumentException("Preencha tipo, nome e extra.");
-        }
-
-        // 2. números fazem sentido?
-        if (dados.preco() <= 0) {
-            throw new IllegalArgumentException("O preço deve ser maior que zero.");
-        }
-        if (dados.estoque() < 0) {
-            throw new IllegalArgumentException("O estoque não pode ser negativo.");
-        }
-
-        // 3. o código já existe?
+        // 1. o código já existe?
         if (repositorio.existsById(dados.codigo())) {
             throw new IllegalArgumentException("Já existe um produto com o código " + dados.codigo() + ".");
         }
 
-        // 4. monta o produto conforme o tipo
+        // 2. monta o produto conforme o tipo
         String nome = dados.nome().trim();
         String extra = dados.extra().trim();
         Produto produto;
@@ -89,7 +76,7 @@ public class ProdutoService {
                 throw new IllegalArgumentException("Tipo inválido. Use ELETRONICO, ROUPA ou ALIMENTO.");
         }
 
-        // 5. guarda no banco
+        // 3. guarda no banco
         return repositorio.save(produto);
     }
 
@@ -98,17 +85,6 @@ public class ProdutoService {
         Produto produto = repositorio.findById(codigo).orElse(null);
         if (produto == null) {
             return null;
-        }
-
-        // valida tudo antes de alterar qualquer coisa
-        if (dados.nome() == null || dados.nome().isBlank()) {
-            throw new IllegalArgumentException("O nome não pode ficar vazio.");
-        }
-        if (dados.preco() <= 0) {
-            throw new IllegalArgumentException("O preço deve ser maior que zero.");
-        }
-        if (dados.estoque() < 0) {
-            throw new IllegalArgumentException("O estoque não pode ser negativo.");
         }
 
         produto.setNome(dados.nome().trim());

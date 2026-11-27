@@ -129,4 +129,64 @@ class VendaServiceTest {
 
         assertThrows(RecursoNaoEncontradoException.class, () -> vendaService.finalizar(99L));
     }
+
+    // ---------------------------------------------------------------- cancelar
+
+    @Test
+    @DisplayName("cancelar venda ABERTA: vira CANCELADA e o estoque não muda (nunca foi baixado)")
+    void cancelarVendaAberta() {
+        when(vendaRepository.findById(1L)).thenReturn(Optional.of(venda));
+
+        VendaResponse resposta = vendaService.cancelar(1L);
+
+        assertEquals(StatusVenda.CANCELADA, resposta.status());
+        assertNotNull(resposta.dataHoraCancelamento());
+        assertEquals(50, arroz.getEstoque());
+        assertEquals(20, camiseta.getEstoque());
+        verify(vendaRepository).save(venda);
+    }
+
+    @Test
+    @DisplayName("cancelar venda FINALIZADA: devolve o estoque de cada item")
+    void cancelarVendaFinalizadaDevolveEstoque() {
+        when(vendaRepository.findById(1L)).thenReturn(Optional.of(venda));
+        vendaService.finalizar(1L);   // arroz 48, camiseta 19
+
+        vendaService.cancelar(1L);
+
+        assertEquals(StatusVenda.CANCELADA, venda.getStatus());
+        assertEquals(50, arroz.getEstoque());      // voltou
+        assertEquals(20, camiseta.getEstoque());   // voltou
+    }
+
+    @Test
+    @DisplayName("cancelar duas vezes é recusado (o estoque não pode voltar em dobro)")
+    void cancelarDuasVezes() {
+        when(vendaRepository.findById(1L)).thenReturn(Optional.of(venda));
+        vendaService.finalizar(1L);
+        vendaService.cancelar(1L);
+
+        assertThrows(IllegalArgumentException.class, () -> vendaService.cancelar(1L));
+
+        assertEquals(50, arroz.getEstoque());   // e não virou 52
+    }
+
+    @Test
+    @DisplayName("venda CANCELADA não pode ser finalizada nem receber itens")
+    void vendaCanceladaFicaTravada() {
+        when(vendaRepository.findById(1L)).thenReturn(Optional.of(venda));
+        vendaService.cancelar(1L);
+
+        assertThrows(IllegalArgumentException.class, () -> vendaService.finalizar(1L));
+        assertThrows(IllegalArgumentException.class, () -> venda.adicionarItem(arroz, 1));
+        assertEquals(50, arroz.getEstoque());
+    }
+
+    @Test
+    @DisplayName("cancelar venda que não existe dá RecursoNaoEncontradoException (vira 404)")
+    void cancelarVendaInexistente() {
+        when(vendaRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(RecursoNaoEncontradoException.class, () -> vendaService.cancelar(99L));
+    }
 }

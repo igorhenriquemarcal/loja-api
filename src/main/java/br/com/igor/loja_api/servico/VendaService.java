@@ -66,6 +66,15 @@ public class VendaService {
         return VendaResponse.de(venda);
     }
 
+    // cancela a venda; se ela já estava finalizada, devolve o estoque (tudo ou nada, de novo)
+    @Transactional
+    public VendaResponse cancelar(Long vendaId) {
+        Venda venda = buscarVenda(vendaId);
+        venda.cancelar();
+        vendaRepository.save(venda);
+        return VendaResponse.de(venda);
+    }
+
     private Venda buscarVenda(Long id) {
         return vendaRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Venda " + id + " não encontrada."));

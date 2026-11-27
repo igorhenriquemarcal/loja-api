@@ -52,6 +52,13 @@ public class VendaController {
         return vendaService.finalizar(id);   // 200 + a venda FINALIZADA
     }
 
+    // POST /vendas/1/cancelar  -> desistência (aberta) ou estorno (finalizada, devolve o estoque)
+    // não é DELETE: a venda continua existindo no histórico, só muda para CANCELADA
+    @PostMapping("/{id}/cancelar")
+    public VendaResponse cancelar(@PathVariable Long id) {
+        return vendaService.cancelar(id);   // 200 + a venda CANCELADA
+    }
+
     // DELETE /vendas/1/itens/5  -> tira um item da venda
     @DeleteMapping("/{id}/itens/{itemId}")
     public VendaResponse removerItem(@PathVariable Long id, @PathVariable Long itemId) {

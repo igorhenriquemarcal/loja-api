@@ -14,6 +14,7 @@ public record VendaResponse(
         Long id,
         LocalDateTime dataHora,
         LocalDateTime dataHoraFinalizacao,
+        LocalDateTime dataHoraCancelamento,
         StatusVenda status,
         List<ItemVendaResponse> itens,
         BigDecimal total
@@ -24,6 +25,7 @@ public record VendaResponse(
                 .map(ItemVendaResponse::de)
                 .toList();
         return new VendaResponse(venda.getId(), venda.getDataHora(), venda.getDataHoraFinalizacao(),
+                venda.getDataHoraCancelamento(),
                 venda.getStatus(), itens, venda.getTotal());
     }
 }

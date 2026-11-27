@@ -30,6 +30,9 @@ public class Venda {
     // quando foi paga (fica vazio enquanto a venda está aberta)
     private LocalDateTime dataHoraFinalizacao;
 
+    // quando foi cancelada (fica vazio se não foi)
+    private LocalDateTime dataHoraCancelamento;
+
     // STRING: grava "ABERTA" no banco (e não 0, 1, 2), mais fácil de ler e mais seguro
     @Enumerated(EnumType.STRING)
     private StatusVenda status;
@@ -99,6 +102,25 @@ public class Venda {
         dataHoraFinalizacao = LocalDateTime.now();
     }
 
+    // desistência ou estorno.
+    // ABERTA     -> CANCELADA: o estoque nunca foi baixado, então não há nada para devolver
+    // FINALIZADA -> CANCELADA: os produtos voltam para a prateleira
+    // CANCELADA  -> recusa (senão o estoque seria devolvido duas vezes)
+    public void cancelar() {
+        if (status == StatusVenda.CANCELADA) {
+            throw new IllegalArgumentException("A venda " + id + " já está CANCELADA.");
+        }
+
+        if (status == StatusVenda.FINALIZADA) {
+            for (ItemVenda item : itens) {
+                item.getProduto().devolverEstoque(item.getQuantidade());
+            }
+        }
+
+        status = StatusVenda.CANCELADA;
+        dataHoraCancelamento = LocalDateTime.now();
+    }
+
     // só dá para mexer numa venda que ainda está aberta
     private void garantirAberta() {
         if (status != StatusVenda.ABERTA) {
@@ -133,6 +155,10 @@ public class Venda {
 
     public LocalDateTime getDataHoraFinalizacao() {
         return dataHoraFinalizacao;
+    }
+
+    public LocalDateTime getDataHoraCancelamento() {
+        return dataHoraCancelamento;
     }
 
     public StatusVenda getStatus() {

@@ -83,6 +83,14 @@ public abstract class Produto {
 
     public abstract BigDecimal calcularFrete();
 
+    // põe de volta na prateleira (usado quando uma venda finalizada é cancelada)
+    public void devolverEstoque(int quantidade) {
+        if (quantidade <= 0) {
+            throw new IllegalArgumentException("Quantidade deve ser maior que zero.");
+        }
+        estoque += quantidade;
+    }
+
     // tira da prateleira; recusa se não tiver o suficiente
     public void baixarEstoque(int quantidade) {
         if (quantidade <= 0) {

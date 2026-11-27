@@ -1,5 +1,8 @@
 package br.com.igor.loja_api.modelo;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
@@ -13,7 +16,7 @@ public class Eletronico extends Produto {
     protected Eletronico() {
     }
 
-    public Eletronico(int codigo, String nome, double preco, int estoque, int garantiaMeses) {
+    public Eletronico(int codigo, String nome, BigDecimal preco, int estoque, int garantiaMeses) {
         super(codigo, nome, preco, estoque);
         this.garantiaMeses = garantiaMeses;
     }
@@ -28,7 +31,8 @@ public class Eletronico extends Produto {
     }
 
     @Override
-    public double calcularFrete() {
-        return getPreco() * 0.05;
+    public BigDecimal calcularFrete() {
+        // 5% do preço, arredondado para centavos
+        return getPreco().multiply(new BigDecimal("0.05")).setScale(2, RoundingMode.HALF_EVEN);
     }
 }

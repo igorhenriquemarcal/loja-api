@@ -1,5 +1,7 @@
 package br.com.igor.loja_api.modelo;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
@@ -14,7 +16,7 @@ public class Roupa extends Produto {
     }
 
 
-    public Roupa(int codigo, String nome, double preco, int estoque, String tamanho) {
+    public Roupa(int codigo, String nome, BigDecimal preco, int estoque, String tamanho) {
         super(codigo, nome, preco, estoque);
         this.tamanho = tamanho;
     }
@@ -29,8 +31,9 @@ public class Roupa extends Produto {
     }
 
     @Override
-    public double calcularFrete() {
-        return 15.0;
+    public BigDecimal calcularFrete() {
+        // frete fixo; criar BigDecimal a partir de texto evita o erro do double
+        return new BigDecimal("15.00");
     }
 
 }

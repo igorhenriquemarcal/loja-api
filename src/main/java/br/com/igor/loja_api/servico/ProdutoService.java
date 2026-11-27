@@ -1,5 +1,6 @@
 package br.com.igor.loja_api.servico;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.data.domain.Sort;
@@ -24,9 +25,9 @@ public class ProdutoService {
 
         // dados de exemplo: só entram se o banco estiver vazio
         if (repositorio.count() == 0) {
-            repositorio.save(new Eletronico(1, "Fone", 200.0, 5, 12));
-            repositorio.save(new Roupa(2, "Camiseta", 80.0, 20, "M"));
-            repositorio.save(new Alimento(3, "Arroz 5kg", 30.0, 50, "31/12/2026"));
+            repositorio.save(new Eletronico(1, "Fone", new BigDecimal("200.00"), 5, 12));
+            repositorio.save(new Roupa(2, "Camiseta", new BigDecimal("80.00"), 20, "M"));
+            repositorio.save(new Alimento(3, "Arroz 5kg", new BigDecimal("30.00"), 50, "31/12/2026"));
         }
     }
 

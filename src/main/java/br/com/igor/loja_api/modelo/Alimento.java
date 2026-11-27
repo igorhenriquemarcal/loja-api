@@ -1,5 +1,8 @@
 package br.com.igor.loja_api.modelo;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
@@ -13,7 +16,7 @@ public class Alimento extends Produto{
     protected Alimento() {
     }
 
-    public Alimento(int codigo, String nome, double preco, int estoque, String dataValidade){
+    public Alimento(int codigo, String nome, BigDecimal preco, int estoque, String dataValidade){
         super(codigo, nome, preco, estoque);
         this.dataValidade = dataValidade;
     }
@@ -28,7 +31,8 @@ public class Alimento extends Produto{
     }
 
     @Override
-    public double calcularFrete(){
-        return getPreco() * 0.10;
+    public BigDecimal calcularFrete(){
+        // 10% do preço, arredondado para centavos
+        return getPreco().multiply(new BigDecimal("0.10")).setScale(2, RoundingMode.HALF_EVEN);
     }
 }

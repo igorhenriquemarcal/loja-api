@@ -14,6 +14,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 
+import br.com.igor.loja_api.excecao.RecursoNaoEncontradoException;
+
 // a "comanda" do caixa: começa ABERTA e vai recebendo itens
 @Entity
 public class Venda {
@@ -40,6 +42,51 @@ public class Venda {
     public Venda() {
         this.dataHora = LocalDateTime.now();
         this.status = StatusVenda.ABERTA;
+    }
+
+    // passa um produto no caixa.
+    // se o produto já está na venda, só aumenta a quantidade (como "bipar" o mesmo arroz duas vezes)
+    public ItemVenda adicionarItem(Produto produto, int quantidade) {
+        garantirAberta();
+
+        for (ItemVenda item : itens) {
+            if (item.getProduto().getCodigo() == produto.getCodigo()) {
+                int novaQuantidade = item.getQuantidade() + quantidade;
+                verificarEstoque(produto, novaQuantidade);
+                item.setQuantidade(novaQuantidade);
+                return item;
+            }
+        }
+
+        verificarEstoque(produto, quantidade);
+        ItemVenda novo = new ItemVenda(this, produto, quantidade);
+        itens.add(novo);
+        return novo;
+    }
+
+    // tira uma linha da comanda (o orphanRemoval apaga do banco)
+    public void removerItem(Long itemId) {
+        garantirAberta();
+
+        boolean removeu = itens.removeIf(item -> item.getId().equals(itemId));
+        if (!removeu) {
+            throw new RecursoNaoEncontradoException("Item " + itemId + " não encontrado na venda " + id + ".");
+        }
+    }
+
+    // só dá para mexer numa venda que ainda está aberta
+    private void garantirAberta() {
+        if (status != StatusVenda.ABERTA) {
+            throw new IllegalArgumentException("A venda " + id + " está " + status + " e não pode ser alterada.");
+        }
+    }
+
+    // aqui só CONFERE se tem estoque; a baixa de verdade acontece ao finalizar a venda
+    private void verificarEstoque(Produto produto, int quantidadeDesejada) {
+        if (quantidadeDesejada > produto.getEstoque()) {
+            throw new IllegalArgumentException("Estoque insuficiente de " + produto.getNome()
+                    + ". Disponível: " + produto.getEstoque());
+        }
     }
 
     // soma dos subtotais dos itens (calculado na hora, não fica no banco)

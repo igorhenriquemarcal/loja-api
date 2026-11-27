@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
@@ -33,6 +34,10 @@ public record ProdutoRequest(
         int estoque,
 
         @NotBlank(message = "O extra é obrigatório.")
-        String extra
+        String extra,
+
+        // opcional: se vier null, passa; se vier, precisa ter 8 ou 13 números
+        @Pattern(regexp = "\\d{8}|\\d{13}", message = "O código de barras deve ter 8 ou 13 números.")
+        String codigoBarras
 ) {
 }

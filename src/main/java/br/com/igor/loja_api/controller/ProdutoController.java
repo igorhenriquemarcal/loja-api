@@ -50,6 +50,16 @@ public class ProdutoController {
         return ResponseEntity.ok(produto);              // 200 + o produto em JSON
     }
 
+    // GET /produtos/barras/7891234567895  (o "bip" do caixa)
+    @GetMapping("/barras/{codigoBarras}")
+    public ResponseEntity<Produto> buscarPorCodigoBarras(@PathVariable String codigoBarras) {
+        Produto produto = produtoService.buscarPorCodigoBarras(codigoBarras);
+        if (produto == null) {
+            return ResponseEntity.notFound().build();   // 404: nenhum produto com esse código
+        }
+        return ResponseEntity.ok(produto);              // 200
+    }
+
     // POST /produtos (o produto novo vem no corpo do pedido, em JSON)
     // se o service recusar (código repetido, tipo inválido...), o TratadorDeErros devolve o 400
     @PostMapping

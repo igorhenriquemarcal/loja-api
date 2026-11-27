@@ -23,6 +23,11 @@ public abstract class Produto {
     private BigDecimal preco;
     private int estoque;
 
+    // o número embaixo das barrinhas (EAN-13 ou EAN-8); é o que o leitor do caixa "bipa"
+    // opcional (granel não tem), mas se existir não pode repetir: unique = true
+    @Column(unique = true, length = 13)
+    private String codigoBarras;
+
     // o JPA precisa de um construtor vazio para recriar o objeto a partir do banco
     protected Produto() {
     }
@@ -40,6 +45,14 @@ public abstract class Produto {
 
     public void setCodigo(int codigo) {
         this.codigo = codigo;
+    }
+
+    public String getCodigoBarras() {
+        return codigoBarras;
+    }
+
+    public void setCodigoBarras(String codigoBarras) {
+        this.codigoBarras = codigoBarras;
     }
 
     public String getNome() {

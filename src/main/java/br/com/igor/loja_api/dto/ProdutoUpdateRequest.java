@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
@@ -23,6 +24,10 @@ public record ProdutoUpdateRequest(
         BigDecimal preco,
 
         @PositiveOrZero(message = "O estoque não pode ser negativo.")
-        int estoque
+        int estoque,
+
+        // PUT troca tudo: se não vier, o produto fica sem código de barras
+        @Pattern(regexp = "\\d{8}|\\d{13}", message = "O código de barras deve ter 8 ou 13 números.")
+        String codigoBarras
 ) {
 }

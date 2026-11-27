@@ -44,6 +44,11 @@ public class ProdutoService {
         return repositorio.findById(codigo).orElse(null);
     }
 
+    // o que o caixa usa ao "bipar" o produto; devolve null se não existir
+    public Produto buscarPorCodigoBarras(String codigoBarras) {
+        return repositorio.findByCodigoBarras(codigoBarras).orElse(null);
+    }
+
     // cria o produto do tipo certo
     // (os campos já chegam conferidos pelo @Valid do controller; aqui ficam só as regras de negócio)
     public Produto cadastrar(ProdutoRequest dados) {
@@ -52,7 +57,12 @@ public class ProdutoService {
             throw new IllegalArgumentException("Já existe um produto com o código " + dados.codigo() + ".");
         }
 
-        // 2. monta o produto conforme o tipo
+        // 2. o código de barras (se veio) já está em outro produto?
+        if (dados.codigoBarras() != null && repositorio.existsByCodigoBarras(dados.codigoBarras())) {
+            throw new IllegalArgumentException("Já existe um produto com o código de barras " + dados.codigoBarras() + ".");
+        }
+
+        // 3. monta o produto conforme o tipo
         String nome = dados.nome().trim();
         String extra = dados.extra().trim();
         Produto produto;
@@ -77,7 +87,8 @@ public class ProdutoService {
                 throw new IllegalArgumentException("Tipo inválido. Use ELETRONICO, ROUPA ou ALIMENTO.");
         }
 
-        // 3. guarda no banco
+        // 4. guarda no banco
+        produto.setCodigoBarras(dados.codigoBarras());
         return repositorio.save(produto);
     }
 
@@ -88,9 +99,16 @@ public class ProdutoService {
             return null;
         }
 
+        // o código de barras não pode estar em OUTRO produto (no próprio, tudo bem)
+        if (dados.codigoBarras() != null
+                && repositorio.existsByCodigoBarrasAndCodigoNot(dados.codigoBarras(), codigo)) {
+            throw new IllegalArgumentException("Já existe um produto com o código de barras " + dados.codigoBarras() + ".");
+        }
+
         produto.setNome(dados.nome().trim());
         produto.setPreco(dados.preco());
         produto.setEstoque(dados.estoque());
+        produto.setCodigoBarras(dados.codigoBarras());
         return repositorio.save(produto);
     }
 
